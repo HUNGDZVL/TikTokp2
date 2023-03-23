@@ -157,8 +157,8 @@ function Header() {
                         {currentUser ? (
                             <img
                                 className={cx('user-avatar')}
-                                src="https://p16-sign-va.tiktokcdn.com/tos-useast2a-avt-0068-giso/ea0854578085ab26effc2c7b8cefa270~c5_100x100.jpeg?x-expires=1651658400&x-signature=zeUCDyTxctGYZ5%2Bsh422klviXFE%3D"
-                                alt="Nguyen Van A"
+                                src="https://p9-sign-sg.tiktokcdn.com/aweme/100x100/tiktok-obj/1663152791024641.jpeg?x-expires=1679745600&x-signature=mjTzP4ERDQK%2BUmFNhpokLtAUjAg%3D"
+                                alt="Nguyen Thi A"
                             />
                         ) : (
                             <button className={cx('more-btn')}>
