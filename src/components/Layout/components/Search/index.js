@@ -17,13 +17,31 @@ function Search() {
 
     const [showResult, setShowResult] = useState(true); // state de an hien tippy search input
 
+     const [loading, setLoading] = useState(false);// state de an hien icon loading khi dang nhap ki tu vo input 
+
     const inputRef = useRef(); //get element input to handle event focus
 
     useEffect(() => {
-        setTimeout(() => {
-            setSearchResult([1]); //Effect giúp hiên thị ra list tippy tìm kiếm thông qua setSearchResult
-        }, 0);
-    }, []);
+        // neu nhu searchValue khong co thi thoat ham khong goi api
+        if(!searchValue.trim()){//trim() loai bo ki tu trong
+            setSearchResult([]);// khi xoa het thi set lai typpi thanh mang rong de an di
+            return; 
+            
+        }
+
+        setLoading(true);
+
+         //Effect getAPI giúp hiên thị ra list tippy tìm kiếm thông qua setSearchResult khi user go vao o tim kiem
+        fetch(`https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(searchValue)}&type=less`)//mothod encode giup loai bo cac ki tu dac biet gay error link url
+           .then(res =>res.json())//chuyen doi du lieu json sang javascript
+           .then(res =>{
+            setSearchResult(res.data);//chot vo data trong api de lay value
+            setLoading(false)
+        })
+        .catch(()=>{
+            setLoading(false);//loading khi erro
+        })
+    }, [searchValue]);
 
     const handleClear = () => {
         setSearchValue(''); //set lai value input khi click
@@ -37,15 +55,16 @@ function Search() {
     return (
         <HeadlessTippy
             interactive
-            visible={showResult && searchResult.length > 0} //dieu kien hien tippy list search
+            visible={showResult && searchResult.length > 0} //dieu kien hien tippy list search khi thoa 2 dieu kien
             render={(attrs) => (
                 <div className={cx('search-result')} tabIndex="-1" {...attrs}>
                     <PopperWrapper>
                         <h4 className={cx('search-title')}>Accounts</h4>
-                        <AccountItem />
-                        <AccountItem />
-                        <AccountItem />
-                        <AccountItem />
+                       {searchResult.map(result =>(// map ket qua tra ve từ api để rander ra giao diện ng dùng
+                           <AccountItem key={result.id} data={result}/>// truyen props data vao component AccountItem de render data tu api vao component
+
+                       ))}
+                     
                     </PopperWrapper>
                 </div>
             )}
@@ -63,12 +82,13 @@ function Search() {
                     onFocus={() => setShowResult(true)}//khi focus thi hien lai tippy list
 
                />
-                {!!searchValue && (
+                {!!searchValue && !loading  && (// neu co ki tu trong input thi thuc hien hanh vi click icon x de delete ki tu va focus lai input
                     <button className={cx('clear')} onClick={handleClear}>
                         <FontAwesomeIcon icon={faCircleXmark} />
                     </button>
                 )}
-                {/* <FontAwesomeIcon className={cx('loading')} icon={faSpinner} /> */}
+                { loading && <FontAwesomeIcon className={cx('loading')} icon={faSpinner} /> } 
+                {/* neu co loading thi hien icon */}
 
                 <button className={cx('search-btn')}>
                     <SearchIcon />
