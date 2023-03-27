@@ -1,5 +1,6 @@
 import { faSpinner, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState, useRef } from 'react';
+import {useDebounce} from'~/hooks';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import HeadlessTippy from '@tippyjs/react/headless';
@@ -19,29 +20,31 @@ function Search() {
 
      const [loading, setLoading] = useState(false);// state de an hien icon loading khi dang nhap ki tu vo input 
 
+    const debounce = useDebounce(searchValue,500);
+
     const inputRef = useRef(); //get element input to handle event focus
 
     useEffect(() => {
         // neu nhu searchValue khong co thi thoat ham khong goi api
-        if(!searchValue.trim()){//trim() loai bo ki tu trong
-            setSearchResult([]);// khi xoa het thi set lai typpi thanh mang rong de an di
-            return; 
-            
+        if (!debounce.trim()) {
+            //trim() loai bo ki tu trong
+            setSearchResult([]); // khi xoa het thi set lai typpi thanh mang rong de an di
+            return;
         }
 
         setLoading(true);
 
-         //Effect getAPI giúp hiên thị ra list tippy tìm kiếm thông qua setSearchResult khi user go vao o tim kiem
-        fetch(`https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(searchValue)}&type=less`)//mothod encode giup loai bo cac ki tu dac biet gay error link url
-           .then(res =>res.json())//chuyen doi du lieu json sang javascript
-           .then(res =>{
-            setSearchResult(res.data);//chot vo data trong api de lay value
-            setLoading(false)
-        })
-        .catch(()=>{
-            setLoading(false);//loading khi erro
-        })
-    }, [searchValue]);
+        //Effect getAPI giúp hiên thị ra list tippy tìm kiếm thông qua setSearchResult khi user go vao o tim kiem
+        fetch(`https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(debounce)}&type=less`) //mothod encode giup loai bo cac ki tu dac biet gay error link url
+            .then((res) => res.json()) //chuyen doi du lieu json sang javascript
+            .then((res) => {
+                setSearchResult(res.data); //chot vo data trong api de lay value
+                setLoading(false);
+            })
+            .catch(() => {
+                setLoading(false); //loading khi erro
+            });
+    }, [debounce]);
 
     const handleClear = () => {
         setSearchValue(''); //set lai value input khi click
